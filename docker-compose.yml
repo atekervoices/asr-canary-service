@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   parakeet-fastapi:
     build: .
@@ -30,5 +29,20 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: ['0']     # Explicitly name the GPUs (matches CUDA_VISIBLE_DEVICES)
+              device_ids: ['0']
               capabilities: [gpu]
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    environment:
+      - NGROK_AUTHTOKEN=3CpaOBChULANro5qKI2WiZ7e1ax_4NPKkJ4hG6G35kY5yg7RY
+    command:
+      - "http"
+      - "--domain=record-unscrew-escapable.ngrok-free.dev"
+      - "--host-header=rewrite"
+      - "parakeet-fastapi:8001"
+    ports:
+      - "4040:4040"
+    depends_on:
+      - parakeet-fastapi
