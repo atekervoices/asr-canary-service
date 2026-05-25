@@ -8,6 +8,7 @@ services:
       - PYTHONUNBUFFERED=1
       # Model Configuration
       # - PARAKEET_MODEL_NAME=nvidia/parakeet-tdt-0.6b-v3
+      - HF_TOKEN=
       - CANARY_MODEL_NAME=Ateker/canary-1b-v2-kdj-finetuned
       - TARGET_SR=16000
       - MODEL_PRECISION=fp16
