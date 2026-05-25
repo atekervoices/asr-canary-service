@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  parakeet-fastapi:
+    build: .
+    ports:
+      - "8080:8001"
+    environment:
+      - PYTHONUNBUFFERED=1
+      # Model Configuration
+      - PARAKEET_MODEL_NAME=nvidia/parakeet-tdt-0.6b-v3
+      - CANARY_MODEL_NAME=Ateker/canary-1b-v2-kdj-finetuned
+      - TARGET_SR=16000
+      - MODEL_PRECISION=fp16
+      - DEVICE=cuda
+      - BATCH_SIZE=4
+      - BEAM_SIZE=4
+      - MAX_AUDIO_DURATION=30
+      - PROCESSING_TIMEOUT=60
+      # Logging Configuration
+      - LOG_LEVEL=INFO
+      - LOG_DIR=logs
+    volumes:
+      - .:/root/apps/parakeet-FastAPI
+    working_dir: /root/apps/parakeet-FastAPI
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--limit-concurrency", "100", "--limit-max-requests", "10000", "--workers", "1", "--loop", "uvloop", "--http", "httptools", "--access-log", "--log-level", "warning"]
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']     # Explicitly name the GPUs (matches CUDA_VISIBLE_DEVICES)
+              capabilities: [gpu]
